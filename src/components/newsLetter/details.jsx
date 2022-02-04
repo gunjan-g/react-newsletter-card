@@ -1,6 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
+const URL= process.env.REACT_APP_URL;
+const Authorization= process.env.REACT_APP_AUTHORIZATION;
+
 const DetailsContainer = styled.div`
   height: 100%;
   display: flex;
@@ -99,10 +102,10 @@ const handleSubmit = (e) => {
     ]
   };
 
-  fetch("{process.env.REACT_APP_URL}", {
+  fetch(URL, {
     method: "POST",
     headers: {
-      Authorization: "{process.env.REACT_APP_AUTHORIZATIO}"
+      Authorization: Authorization
     },
     body: JSON.stringify(dataVal)
   })
