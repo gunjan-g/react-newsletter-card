@@ -82,6 +82,36 @@ const SubscribeButton = styled.button`
   }
 `;
 
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const email = new FormData(e.target).get("email");
+
+  if (!email) {
+    console.log("Failed");
+  }
+
+  const dataVal = {
+    members: [
+      {
+        email_address: email, //string
+        status: "subscribed", //string
+      }
+    ]
+  };
+
+  fetch("{process.env.REACT_APP_URL}", {
+    method: "POST",
+    headers: {
+      Authorization: "{process.env.REACT_APP_AUTHORIZATIO}"
+    },
+    body: JSON.stringify(dataVal)
+  })
+    .then((response) => {
+      console.log("Success");
+    })
+    .catch((err) => console.log(err));
+};
+
 export function Details(props) {
   return (
     <DetailsContainer>
@@ -93,8 +123,10 @@ export function Details(props) {
           once a week, every wednesday.
         </Text>
         <FormGroup>
-          <EmailInput type="text" placeholder="example@email.com" />
-          <SubscribeButton>Subscribe</SubscribeButton>
+          <form onSubmit={handleSubmit} autoComplete="off">
+          <EmailInput type="email" name="email" placeholder="example@email.com" required />
+          <SubscribeButton type="submit">Subscribe</SubscribeButton>
+          </form>
         </FormGroup>
       </InnerContainer>
     </DetailsContainer>
