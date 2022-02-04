@@ -1,8 +1,6 @@
-import React from "react";
+import React, {useState, useEffect} from 'react';
 import styled from "styled-components";
-
-const URL= process.env.REACT_APP_URL;
-const Authorization= process.env.REACT_APP_AUTHORIZATION;
+import MailchimpSubscribe from "react-mailchimp-subscribe";
 
 const DetailsContainer = styled.div`
   height: 100%;
@@ -17,6 +15,7 @@ const InnerContainer = styled.div`
   display: flex;
   flex-direction: column;
   max-width: 80%;
+  height: 95%;
 `;
 
 const Header = styled.h1`
@@ -46,7 +45,7 @@ const FormGroup = styled.div`
   margin-top: 1em;
 `;
 
-const EmailInput = styled.input`
+const InputField = styled.input`
   outline: none;
   border: none;
   background-color: #fff;
@@ -79,59 +78,113 @@ const SubscribeButton = styled.button`
   border-bottom-right-radius: 16px;
   border-top-right-radius: 16px;
   padding: 0 10px;
-
-  &:hover {
-    background-color: #1820bb;
-  }
 `;
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-  const email = new FormData(e.target).get("email");
+const CustomForm = ({ status, message, onValidated }) => {
 
-  if (!email) {
-    console.log("Failed");
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+
+
+  const handleSubmit = (e) => {
+      e.preventDefault();
+      email &&
+      firstName &&
+      lastName &&
+      email.indexOf("@") > -1 &&
+      onValidated({
+          EMAIL: email,
+          MERGE1: firstName,
+          MERGE2: lastName,
+      });
+
   }
 
-  const dataVal = {
-    members: [
-      {
-        email_address: email, //string
-        status: "subscribed", //string
-      }
-    ]
-  };
-
-  fetch(URL, {
-    method: "POST",
-    headers: {
-      Authorization: Authorization
-    },
-    body: JSON.stringify(dataVal)
+  useEffect(() => {
+      if(status === "success") clearFields();
   })
-    .then((response) => {
-      console.log("Success");
-    })
-    .catch((err) => console.log(err));
-};
 
-export function Details(props) {
+  const clearFields = () => {
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+  }
+
   return (
-    <DetailsContainer>
-      <InnerContainer>
-        <Header>Hey, wait...</Header>
-        <SubHeader>Subscribe to our newsletter!</SubHeader>
-        <Text>
-          You will never miss our podcasts, latest news, etc. Our newsletter is
-          once a week, every wednesday.
-        </Text>
-        <FormGroup>
-          <form onSubmit={handleSubmit} autoComplete="off">
-          <EmailInput type="email" name="email" placeholder="example@email.com" required />
-          <SubscribeButton type="submit">Subscribe</SubscribeButton>
-          </form>
+    <form
+        className="mc__form"
+        onSubmit={(e) => handleSubmit(e)}
+    >
+
+          <DetailsContainer>
+          <InnerContainer>
+          <Header>Hey, wait...</Header>
+          <SubHeader>Subscribe to our newsletter!</SubHeader>
+          <Text>
+            You will never miss our podcasts, latest news, etc. Our newsletter is
+            once a week, every wednesday.
+          </Text>
+          <FormGroup>
+          <div className="mc__field-container">
+                <InputField
+                    label="First Name"
+                    onChangeHandler={setFirstName}
+                    type="text"
+                    value={firstName}
+                    placeholder="Jane"
+                    isRequired
+                />
+
+                <InputField
+                    label="Last Name"
+                    onChangeHandler={setLastName}
+                    type="text"
+                    value={lastName}
+                    placeholder="Doe"
+                    isRequired
+                />
+
+                <InputField
+                    label="Email"
+                    onChangeHandler={setEmail}
+                    type="email"
+                    value={email}
+                    placeholder="your@email.com"
+                    isRequired
+                />
+
+            </div>
+
+        <SubscribeButton
+                label="close"
+                size="big"
+                customClass="g__justify-self-center"
+            /> : <InputField
+                label="subscribe"
+                type="submit"
+                formValues={[email, firstName, lastName]}
+            />
         </FormGroup>
       </InnerContainer>
     </DetailsContainer>
+    </form>
+);
+};
+
+
+export function Details(props) {
+  const url = `https://gmail.us20.list-manage.com/subscribe/post?u=${process.env.REACT_APP_MAILCHIMP_U}&id=${process.env.REACT_APP_MAILCHIMP_ID}`;
+  return (
+    <MailchimpSubscribe
+                url={url}
+                render={({ subscribe, status, message }) => (
+                    <CustomForm
+                        status={status}
+                        message={message}
+                        onValidated={formData => subscribe(formData)}
+                    />
+                )}
+            />
   );
 }
