@@ -86,6 +86,7 @@ const SubscribeButton = styled.button`
 `;
 
 const handleSubmit = (e) => {
+  console.log("error");
   e.preventDefault();
   const email = new FormData(e.target).get("email");
 
@@ -102,15 +103,15 @@ const handleSubmit = (e) => {
     ]
   };
 
-  fetch(URL, {
+  fetch('https://us20.api.mailchimp.com/3.0/lists/e415fccd41', {
     method: "POST",
     headers: {
-      Authorization: Authorization
+      Authorization: 'gunjang:6b122cd39168eadbe7fe4f8fd168ee0f-us20'
     },
     body: JSON.stringify(dataVal)
   })
     .then((response) => {
-      console.log("Success");
+      console.log(response);
     })
     .catch((err) => console.log(err));
 };
