@@ -1,9 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 
-const URL= process.env.REACT_APP_URL;
-const Authorization= process.env.REACT_APP_AUTHORIZATION;
-
 const DetailsContainer = styled.div`
   height: 100%;
   display: flex;
@@ -103,10 +100,10 @@ const handleSubmit = (e) => {
     ]
   };
 
-  fetch('https://us20.api.mailchimp.com/3.0/lists/e415fccd41', {
+  fetch('', {     //URL
     method: "POST",
     headers: {
-      Authorization: 'gunjang:6b122cd39168eadbe7fe4f8fd168ee0f-us20'
+      Authorization: ''   //AUTHORIZATION
     },
     body: JSON.stringify(dataVal)
   })
